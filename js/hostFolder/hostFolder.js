@@ -45,21 +45,21 @@ export default class hostFolder {
 
   textCallback = (id, text) => {
     if (this.$container === null || !this.$container.length) return false;
-    if ($(`#contentFolder_${id}`).length) {
-      $(`#contentFolder_${id} .content-folder-text`).text(text).removeClass('d-none')
+    if ($(`#hostFolder_${id}`).length) {
+      $(`#hostFolder_${id} .host-folder-text`).text(text).removeClass('d-none')
     } else {
-      this.$container.append(`<div class="col-md-3" id="contentFolder_${id}"><p class="content-folder-text">${text}</p><img class="content-folder-image d-none img-fluid"></div>`)
+      this.$container.append(`<div class="col-md-3" id="hostFolder_${id}"><p class="host-folder-text">${text}</p><img class="host-folder-image d-none img-fluid"></div>`)
     }
   }
 
   textFallback = (id) => {
     if (this.$container === null || !this.$container.length) return false;
-    $(`#contentFolder_${id}`).remove();
+    $(`#hostFolder_${id}`).remove();
   }
 
   imageCallback = (id, url) => {
     if (this.$container === null || !this.$container.length) return false;
-    $(`#contentFolder_${id} .content-folder-image`).attr('src', url).removeClass('d-none')
+    $(`#hostFolder_${id} .host-folder-image`).attr('src', url).removeClass('d-none')
   }
 
   completedCallback = (results, total) => {
