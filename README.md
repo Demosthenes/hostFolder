@@ -39,7 +39,7 @@ Import the code into your javascript file.
 Create a new object from the class and call the .load method.  
 
 Listeners can be applied to the text and image.  
-Whenever the data is changed the callback function will run.  
+Whenever the data is changed the Renderer function will run.  
 
 ```javascript
 import hostFolder from './hostFolder/hostFolder.js'
@@ -66,7 +66,7 @@ $(document).ready(function () {
     });
 
     // What happens once the data is changed?
-    folder.textCallback = (id, text) => {
+    folder.textRenderer = (id, text) => {
         console.log("text changed: " + text)
 
         // Default code to handle results
@@ -85,7 +85,7 @@ $(document).ready(function () {
     }
     
     // Same thing is possible with the image on change
-    folder.imageCallback = (id, url) => {
+    folder.imageRenderer = (id, url) => {
         if (folder.noContainer()) return false;
         // Update image source and remove hiding class
         $(`#hostFolder_${id} .host-folder-image`).attr('src', url).removeClass('d-none')
@@ -131,15 +131,15 @@ The listeners available are:
 
 ```javascript
   // Once the text is found
-  textCallback = (id, text) => {  }
+  textRenderer = (id, text) => {  }
   
   // The image has lazyloaded and is now available
-  imageCallback = (id, url) => {  }
+  imageRenderer = (id, url) => {  }
 
   // We reached the end, nothing found so clean the loadingtext
   textCompleted = (results, total) => { }
   
-  // All folders have been searched through
+  // All folders have been searched through and images fully loaded
   imageCompleted = (results, total) =>  { }
 
 ```

@@ -49,7 +49,7 @@ export default class hostFolder {
 
   noContainer = () => this.$container === null || !this.$container.length
 
-  textCallback = (id, text) => {
+  textRenderer = (id, text) => {
     if (this.noContainer()) return false;
     if ($(`#hostFolder_${id}`).length) {
       $(`#hostFolder_${id} .host-folder-text`).text(text).removeClass('d-none')
@@ -62,7 +62,7 @@ export default class hostFolder {
     }
   }
 
-  imageCallback = (id, url) => {
+  imageRenderer = (id, url) => {
     if (this.noContainer()) return false;
     $(`#hostFolder_${id} .host-folder-image`).attr('src', url).removeClass('d-none')
   }
@@ -108,7 +108,7 @@ export default class hostFolder {
       // Loop until we no longer find a valid 200 response
       let index = id - startId; // Make sure the array starts at 0 and offsets from start
 
-      this.results[index] = new result(id, this.textCallback, this.imageCallback);
+      this.results[index] = new result(id, this.textRenderer, this.imageRenderer);
       this.results[index].text = this.loadingText;
       this.results[index].image = this.filepath.loadingImage;
 
