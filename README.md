@@ -9,6 +9,11 @@
 
 
 
+# Dependencies
+- Webserver (otherwise there are cors errors in javascript modules)
+- Bootstrap
+- Jquery
+
 
 # How to initiate
 
