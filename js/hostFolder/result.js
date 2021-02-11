@@ -16,7 +16,7 @@ export default class result {
 
   set text(val) {
     this.textInternal = val;
-    this.textListener(val, this.id);
+    this.textListener(this.id, val);
   }
   get text() {
     return this.textInternal;
@@ -24,7 +24,7 @@ export default class result {
 
   set image(val) {
     this.imageInternal = val;
-    this.imageListener(val, this.id);
+    this.imageListener(this.id, val);
   }
   get image() {
     return this.imageInternal;
