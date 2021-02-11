@@ -28,7 +28,11 @@ $(document).ready(function () {
         if ($(`#hostFolder_${id}`).length) {
             $(`#hostFolder_${id} .host-folder-text`).text(text).removeClass('d-none')
         } else {
-            $container.append(`<div class="col-md-3" id="hostFolder_${id}"><p class="host-folder-text">${text}</p><img class="host-folder-image d-none img-fluid"></div>`)
+            $container.append(`
+                <div class="col-md-3" id="hostFolder_${id}">
+                    <p class="host-folder-text">${text}</p>
+                    <img class="host-folder-image d-none img-fluid">
+                </div>`)
         }
     }
 
