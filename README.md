@@ -107,6 +107,12 @@ $(document).ready(function () {
     // load the content and save it into results
     // lazy loaded images will get updated once server responds and can be found in folder.results
     let textResults = folder.load(); // or simply folder.load();
+
+    // .load() has two parameters, start and end id. Assuming you know how many images you want, you can target ids.
+    // .load(5) will load images in folder 5 and dynamically until nothing more exists
+    // .load(1,10) will load images in folder 1 to and with folder 10 (assuming 10 exists, otherwise it exists at the last image)
+    // If nothing is supplied, it will assume id 1 is first and load everything after
+
 });
 ```
 

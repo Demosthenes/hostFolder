@@ -94,8 +94,14 @@ export default class hostFolder {
     })
   }
 
+  reachedEnd(forceStop = false) {
+    this.results.pop();
+    this.textCompleted(this.results, this.results.length);
+    if(forceStop){ this.foundAll = true; }
+  }
+
   // Search and return any content
-  load(startId = 1) {
+  load(startId = 1, endId = false) {
     let id = startId;
     this.results = [];
     this.hasCompleted = 0;
@@ -103,18 +109,26 @@ export default class hostFolder {
     while (!this.foundAll) {
       // Loop until we no longer find a valid 200 response
       let index = id - startId; // Make sure the array starts at 0 and offsets from start
+
       this.results[index] = new result(id, this.textRenderer, this.imageRenderer);
       this.results[index].text = this.loadingText;
       this.results[index].image = this.filepath.loadingImage;
-      this.getText(`${this.baseUrl}/${id}/${this.filename.text}`, index); // Attempt to get the text for this
-      if (!this.foundAll) {
-        this.getImage(`${this.baseUrl}/${id}/${this.filename.image}`, index);
+
+      // Attempt to get the text for this
+      this.getText(`${this.baseUrl}/${id}/${this.filename.text}`, index); 
+
+      if (!this.foundAll && endId !== false && endId === (id - 1)) {
+        this.reachedEnd(true);
       } 
-      else {
-        this.results.pop();
-        this.textCompleted(this.results, this.results.length);
+      else if(!this.foundAll) {
+        this.getImage(`${this.baseUrl}/${id}/${this.filename.image}`, index);
       }
+      else {
+        this.reachedEnd(false);
+      }
+      
       id++; 
+
     }
     return this.results;
   };
