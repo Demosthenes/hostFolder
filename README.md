@@ -51,7 +51,6 @@ $(document).ready(function () {
     let $container = $('#gallery')
 
     // Create new hostFolder by setting options
-   
     let folder = new hostFolder({
         baseUrl: "/hostFolder/content",
         filename: {
