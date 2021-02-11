@@ -43,9 +43,7 @@ export default class hostFolder {
     this.prefetchLoadingImage();
   }
 
-  prefetchLoadingImage = () => {
-    $.get({ url: this.filepath.loadingImage, async: false})
-  }
+  prefetchLoadingImage = () => $.get({ url: this.filepath.loadingImage, async: false})
 
   noContainer = () => this.$container === null || !this.$container.length
 
@@ -74,7 +72,6 @@ export default class hostFolder {
 
   imageCompleted = (results, total) => {
     if (this.noContainer()) return false;
-    
   }
 
   getText(url, index) {
@@ -103,17 +100,13 @@ export default class hostFolder {
     this.results = [];
     this.hasCompleted = 0;
     this.foundAll = false;
-
     while (!this.foundAll) {
       // Loop until we no longer find a valid 200 response
       let index = id - startId; // Make sure the array starts at 0 and offsets from start
-
       this.results[index] = new result(id, this.textRenderer, this.imageRenderer);
       this.results[index].text = this.loadingText;
       this.results[index].image = this.filepath.loadingImage;
-
       this.getText(`${this.baseUrl}/${id}/${this.filename.text}`, index); // Attempt to get the text for this
-
       if (!this.foundAll) {
         this.getImage(`${this.baseUrl}/${id}/${this.filename.image}`, index);
       } 
