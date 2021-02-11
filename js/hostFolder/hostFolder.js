@@ -40,9 +40,6 @@ export default class hostFolder {
     this.filepath = filepath;
     this.loadingText = loadingText;
     this.$container = $container;
-    this.results = [];
-    this.hasCompleted = 0;
-    this.foundAll = false;
     this.prefetchLoadingImage();
   }
 
@@ -96,6 +93,8 @@ export default class hostFolder {
   // Search and return any content
   load(startId = 1) {
     let id = startId;
+    this.results = [];
+    this.hasCompleted = 0;
     this.foundAll = false;
 
     while (!this.foundAll) {
