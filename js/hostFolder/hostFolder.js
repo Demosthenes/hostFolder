@@ -41,6 +41,7 @@ export default class hostFolder {
     this.loadingText = loadingText;
     this.$container = $container;
     this.results = [];
+    this.hasCompleted = 0;
     this.foundAll = false;
     this.prefetchLoadingImage();
   }
@@ -64,6 +65,10 @@ export default class hostFolder {
     $(`#contentFolder_${id} .content-folder-image`).attr('src', url).removeClass('d-none')
   }
 
+  completedCallback = (results, total) => {
+    
+  }
+
   prefetchLoadingImage = () => {
     $.get({ url: this.filepath.loadingImage, async: false})
   }
@@ -82,6 +87,9 @@ export default class hostFolder {
       url, // Request the image file asych with filler until downlaoded
       success: () => (this.results[index].image = url), // Image found on server, add it
       error: () => (this.results[index].image = this.filepath.backupImage), // Image not found, use backup image
+    }).always(()=>{
+      this.hasCompleted++;
+      if(this.results.length === this.hasCompleted) this.completedCallback(this.results, this.hasCompleted);
     })
   }
 

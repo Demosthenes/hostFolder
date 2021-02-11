@@ -67,17 +67,6 @@ $(document).ready(function () {
         $container
     });
 
-    /**
-    * Class Options
-    * @param {string} baseUrl This url will be used as a base location when creating paths
-    * @param {string} filename.text  The name of your text files
-    * @param {string} filename.image  The name of your image files
-    * @param {string} filepath.loadingImage  The path to your loading image, relative to baseUrl
-    * @param {string} filepath.backupImage  The path to your not found image, relative to baseUrl
-    * @param {string} loadingText  What should the text say while loading new results?
-    * @param {Object} $container  A reference to a jquery selector for the container you want the content in
-    */
-
     // What happens once the data is changed?
     folder.textCallback = (id, text) => {
         console.log("text changed: " + text)
@@ -96,11 +85,48 @@ $(document).ready(function () {
         console.log("image changed: " + url)
     }
 
+    // When everything has fully loaded
+    folder.completedCallback = (results, total) => {
+        console.log(`Fetched ${total} entries`)
+        console.log(results)
+    }
+
     // load the content and save it into results
     // lazy loaded images will get updated once server responds
     let results = folder.load();
-
-    console.log(folder.results); // same as contents in results
-    console.log(results); // same as contents in results
 });
+```
+
+The construction options are: 
+
+```javascript
+
+    /**
+    * Class Options
+    * @param {string} baseUrl This url will be used as a base location when creating paths
+    * @param {string} filename.text  The name of your text files
+    * @param {string} filename.image  The name of your image files
+    * @param {string} filepath.loadingImage  The path to your loading image, relative to baseUrl
+    * @param {string} filepath.backupImage  The path to your not found image, relative to baseUrl
+    * @param {string} loadingText  What should the text say while loading new results?
+    * @param {Object} $container  A reference to a jquery selector for the container you want the content in
+    */
+   
+```
+
+The listeners available are:
+
+```javascript
+  // Once the text is found
+  textCallback = (id, text) => {  }
+  
+  // We reached the end, nothing found so clean the loadingtext
+  textFallback = (id) => {  }
+  
+  // The image has lazyloaded and is now available
+  imageCallback = (id, url) => {  }
+
+  // All folders have been searched through
+  completedCallback = (results, total) => {}
+
 ```

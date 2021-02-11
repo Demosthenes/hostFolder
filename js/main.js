@@ -32,10 +32,12 @@ $(document).ready(function () {
         }
     }
 
+    folder.completedCallback = (results, total) => {
+        console.log(`Fetched ${total} entries`)
+        console.log(results)
+    }
+
     // load the content and save it into results
     // lazy loaded images will get updated once server responds
     let results = folder.load();
-
-    console.log(folder.results); // same as contents in results7
-    console.log(results); // same as contents in results
 });
