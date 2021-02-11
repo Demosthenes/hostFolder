@@ -3,6 +3,16 @@
 # [Demo](http://mikaelhellsen.com/hostFolder/)
 
 
+# What is this?
+hostFolder is a small javascript plugin to dynamically traverse a server folder and load the contents.  
+
+This data can then be further manipulated, or simply rendered in an html element.  
+New folders can simply be added to the server, and will be picked up by the script.    
+
+Please note that since this uses incrementing ids, it is not recommended to be used with sensitive or user data.  
+Any usage of this code, by anyone, in perpetuity, is fully on their own risk.   
+
+
 # How to setup locally
 
 ### 1. Get a local server, like apache with [XAMPP](https://www.apachefriends.org/index.html)
@@ -14,8 +24,8 @@
 
 # Dependencies
 - Webserver (otherwise there are cors errors in javascript modules)
-- Bootstrap
 - Jquery
+- Bootstrap (recommended, not required)
 
 
 # How to use
@@ -26,11 +36,11 @@ Make sure you import the script as a javascript module
  <script type="module" src="js/main.js"></script>
 ```
 
-Import the code into your javascript file.
-Create a new object from the class and call the .load method.
+Import the code into your javascript file.  
+Create a new object from the class and call the .load method.  
 
-Listeners can be applied to the text and image.
-Whenever the data is changed the callback function will run
+Listeners can be applied to the text and image.  
+Whenever the data is changed the callback function will run.  
 
 ```javascript
 import hostFolder from './hostFolder/hostFolder.js'
