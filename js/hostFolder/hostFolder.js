@@ -43,8 +43,14 @@ export default class hostFolder {
     this.prefetchLoadingImage();
   }
 
+  prefetchLoadingImage = () => {
+    $.get({ url: this.filepath.loadingImage, async: false})
+  }
+
+  noContainer = () => this.$container === null || !this.$container.length
+
   textCallback = (id, text) => {
-    if (this.$container === null || !this.$container.length) return false;
+    if (this.noContainer()) return false;
     if ($(`#hostFolder_${id}`).length) {
       $(`#hostFolder_${id} .host-folder-text`).text(text).removeClass('d-none')
     } else {
@@ -56,22 +62,19 @@ export default class hostFolder {
     }
   }
 
-  textFallback = (id) => {
-    if (this.$container === null || !this.$container.length) return false;
-    $(`#hostFolder_${id}`).remove();
-  }
-
   imageCallback = (id, url) => {
-    if (this.$container === null || !this.$container.length) return false;
+    if (this.noContainer()) return false;
     $(`#hostFolder_${id} .host-folder-image`).attr('src', url).removeClass('d-none')
   }
 
-  completedCallback = (results, total) => {
-    
+  textCompleted = (results, total) => {
+    if (this.noContainer()) return false;
+    $(`#hostFolder_${results[total-1].id + 1}`).remove();
   }
 
-  prefetchLoadingImage = () => {
-    $.get({ url: this.filepath.loadingImage, async: false})
+  imageCompleted = (results, total) => {
+    if (this.noContainer()) return false;
+    
   }
 
   getText(url, index) {
@@ -90,7 +93,7 @@ export default class hostFolder {
       error: () => (this.results[index].image = this.filepath.backupImage), // Image not found, use backup image
     }).always(()=>{
       this.hasCompleted++;
-      if(this.results.length === this.hasCompleted) this.completedCallback(this.results, this.hasCompleted);
+      if(this.results.length === this.hasCompleted) this.imageCompleted(this.results, this.hasCompleted);
     })
   }
 
@@ -115,8 +118,8 @@ export default class hostFolder {
         this.getImage(`${this.baseUrl}/${id}/${this.filename.image}`, index);
       } 
       else {
-        this.textFallback(id);
         this.results.pop();
+        this.textCompleted(this.results, this.results.length);
       }
       id++; 
     }

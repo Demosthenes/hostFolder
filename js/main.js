@@ -24,7 +24,7 @@ $(document).ready(function () {
         console.log("text changed: " + text)
 
         // Default code to handle results
-        if ($container === null || !$container.length) return false;
+        if (folder.noContainer()) return false;
         if ($(`#hostFolder_${id}`).length) {
             $(`#hostFolder_${id} .host-folder-text`).text(text).removeClass('d-none')
         } else {
@@ -36,8 +36,18 @@ $(document).ready(function () {
         }
     }
 
-    folder.completedCallback = (results, total) => {
-        console.log(`Fetched ${total} entries`)
+    folder.imageCallback = (id, url) => {
+        if (folder.noContainer()) return false;
+        $(`#hostFolder_${id} .host-folder-image`).attr('src', url).removeClass('d-none')
+      }
+
+    folder.textCompleted  = (results, total) => {
+        if (folder.noContainer()) return false;
+        $(`#hostFolder_${results[total-1].id + 1}`).remove();
+    }
+
+    folder.imageCompleted = (results, total) => {
+        console.log(`Fetched all data from ${total} entries`)
         console.log(results)
     }
 

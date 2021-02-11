@@ -70,7 +70,7 @@ $(document).ready(function () {
         console.log("text changed: " + text)
 
         // Default code to handle results
-        if ($container === null || !$container.length) return false;
+        if (folder.noContainer()) return false;
         if ($(`#hostFolder_${id}`).length) {
             $(`#hostFolder_${id} .host-folder-text`).text(text)
         } else {
@@ -84,12 +84,18 @@ $(document).ready(function () {
     
     // Same thing is possible with the image on change
     folder.imageCallback = (id, url) => {
-        console.log("image changed: " + url)
+        if (folder.noContainer()) return false;
+        $(`#hostFolder_${id} .host-folder-image`).attr('src', url).removeClass('d-none')
+      }
+
+    folder.textCompleted  = (results, total) => {
+        if (folder.noContainer()) return false;
+        $(`#hostFolder_${results[total-1].id + 1}`).remove();
     }
 
     // When everything has fully loaded
-    folder.completedCallback = (results, total) => {
-        console.log(`Fetched ${total} entries`)
+    folder.imageCompleted = (results, total) => {
+        console.log(`Fetched all data from ${total} entries`)
         console.log(results)
     }
 
@@ -122,13 +128,13 @@ The listeners available are:
   // Once the text is found
   textCallback = (id, text) => {  }
   
-  // We reached the end, nothing found so clean the loadingtext
-  textFallback = (id) => {  }
-  
   // The image has lazyloaded and is now available
   imageCallback = (id, url) => {  }
 
+  // We reached the end, nothing found so clean the loadingtext
+  textCompleted = (results, total) => { }
+  
   // All folders have been searched through
-  completedCallback = (results, total) => {}
+  imageCompleted = (results, total) =>  { }
 
 ```
