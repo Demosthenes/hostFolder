@@ -20,7 +20,7 @@ $(document).ready(function () {
     });
 
     // What happens once the data is changed?
-    folder.textCallback = (text, id) => {
+    folder.textCallback = (id, text) => {
         console.log("text changed: " + text)
 
         // Default code to handle results

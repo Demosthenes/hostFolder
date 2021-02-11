@@ -24,7 +24,7 @@ export default class hostFolder {
     //this.prefetchLoadingImage();
   }
 
-  textCallback = (text, id) => {
+  textCallback = (id, text) => {
     if (this.$container === null || !this.$container.length) return false;
     if ($(`#contentFolder_${id}`).length) {
       $(`#contentFolder_${id} .content-folder-text`).text(text).removeClass('d-none')
@@ -38,7 +38,7 @@ export default class hostFolder {
     $(`#contentFolder_${id}`).remove();
   }
 
-  imageCallback = (url, id) => {
+  imageCallback = (id, url) => {
     if (this.$container === null || !this.$container.length) return false;
     $(`#contentFolder_${id} .content-folder-image`).attr('src', url).removeClass('d-none')
   }
@@ -72,20 +72,21 @@ export default class hostFolder {
     while (!this.foundAll) {
       // Loop until we no longer find a valid 200 response
       let index = id - startId; // Make sure the array starts at 0 and offsets from start
+
       this.results[index] = new result(id, this.textCallback, this.imageCallback);
-      // Set default result object
       this.results[index].text = this.loadingText;
       this.results[index].image = this.filepath.loadingImage;
 
       this.getText(`${this.baseUrl}/${id}/${this.filename.text}`, index); // Attempt to get the text for this
+
       if (!this.foundAll) {
         this.getImage(`${this.baseUrl}/${id}/${this.filename.image}`, index);
-      } // Attempt to get this image if text was found
+      } 
       else {
-        this.results.pop();
         this.textFallback(id);
-      } // Remove placeholder entry
-      id++; // Go to next id
+        this.results.pop();
+      }
+      id++; 
     }
     return this.results;
   };
