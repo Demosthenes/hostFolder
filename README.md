@@ -1,8 +1,5 @@
 ### hostFolder
 
-# [Demo](http://mikaelhellsen.com/hostFolder/)
-
-
 # What is this?
 hostFolder is a small javascript plugin to dynamically traverse a server folder and load the contents.  
 
@@ -18,10 +15,12 @@ Any usage of this code, by anyone, in perpetuity, is fully on their own risk.
 ### 1. Get a local server, like apache with [XAMPP](https://www.apachefriends.org/index.html)
 ### 2. Start the server on localhost
 ### 3. Clone this repository into your server folder (/htdocs in XAMPP)
-### 4. Visit [http://localhost/hostFolder/](http://localhost/hostFolder/)
+### 4. Visit [http://localhost/hostFolder/](http://localhost/hostFolder/)  
+  
+  
+# [Demo](http://mikaelhellsen.com/hostFolder/)  
 
-
-
+  
 # Dependencies
 - Webserver (otherwise there are cors errors in javascript modules)
 - Jquery
@@ -111,7 +110,7 @@ The construction options are:
     * @param {string} loadingText  What should the text say while loading new results?
     * @param {Object} $container  A reference to a jquery selector for the container you want the content in
     */
-   
+
 ```
 
 The listeners available are:
