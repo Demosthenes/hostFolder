@@ -50,7 +50,7 @@ export default class hostFolder {
     if ($(`#contentFolder_${id}`).length) {
       $(`#contentFolder_${id} .content-folder-text`).text(text).removeClass('d-none')
     } else {
-      this.$container.append(`<div id="contentFolder_${id}"><p class="content-folder-text">${text}</p><img class="content-folder-image img-fluid d-none"></div><br>`)
+      this.$container.append(`<div class="col-md-3" id="contentFolder_${id}"><p class="content-folder-text">${text}</p><img class="content-folder-image d-none img-fluid"></div>`)
     }
   }
 
