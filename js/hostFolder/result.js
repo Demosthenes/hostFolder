@@ -1,3 +1,12 @@
+/**
+* The class for a hostFolder result
+* Required to listen for mutations in variables
+*
+* @author  Mikael Hellsen
+* @version 0.9
+* @since   2021-02-11 
+*/
+
 export default class result {
   constructor(id, textCallback, imageCallback) {
     this.id = id;

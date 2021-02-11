@@ -34,6 +34,7 @@ $(document).ready(function () {
     let $container = $('#gallery')
 
     // Create new hostFolder by setting options
+   
     let folder = new hostFolder({
         baseUrl: "/hostFolder/content",
         filename: {
@@ -47,6 +48,17 @@ $(document).ready(function () {
         loadingText: "Checking for more posts...",
         $container
     });
+
+    /**
+    * Class Options
+    * @param {string} baseUrl This url will be used as a base location when creating paths
+    * @param {string} filename.text  The name of your text files
+    * @param {string} filename.image  The name of your image files
+    * @param {string} filepath.loadingImage  The path to your loading image, relative to baseUrl
+    * @param {string} filepath.backupImage  The path to your not found image, relative to baseUrl
+    * @param {string} loadingText  What should the text say while loading new results?
+    * @param {Object} $container  A reference to a jquery selector for the container you want the content in
+    */
 
     // What happens once the data is changed?
     folder.textCallback = (id, text) => {
