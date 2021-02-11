@@ -53,5 +53,5 @@ $(document).ready(function () {
 
     // load the content and save it into results
     // lazy loaded images will get updated once server responds and can be found in folder.results
-    let results = folder.load();
+    let results = folder.load(); 
 });
