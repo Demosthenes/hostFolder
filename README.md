@@ -1,10 +1,13 @@
 ### hostFolder
 
-# How to setup
+# [Demo](http://mikaelhellsen.com/hostFolder/)
+
+
+# How to setup locally
 
 ### 1. Get a local server, like apache with [XAMPP](https://www.apachefriends.org/index.html)
 ### 2. Start the server on localhost
-### 3. Clone this repository into the /htdocs folder
+### 3. Clone this repository into your server folder (/htdocs in XAMPP)
 ### 4. Visit [http://localhost/hostFolder/](http://localhost/hostFolder/)
 
 
@@ -15,7 +18,7 @@
 - Jquery
 
 
-# How to initiate
+# How to use
 
 Make sure you import the script as a javascript module
 
