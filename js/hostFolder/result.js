@@ -8,12 +8,12 @@
 */
 
 export default class result {
-  constructor(id, textCallback, imageCallback) {
+  constructor(id, textListener, imageListener) {
     this.id = id;
     this.textInternal = "";
     this.imageInternal = "";
-    this.textListener = textCallback;
-    this.imageListener = imageCallback;
+    this.textListener = textListener;
+    this.imageListener = imageListener;
   }
 
   textChanged(listener) {

@@ -53,12 +53,12 @@ export default class hostFolder {
     while (!this.foundAll && ++id) {
       // Loop until we no longer find a valid 200 response
       let index = id - startId; // Make sure the array starts at 0 and offsets from start
-      this.results[index] = new result(id, this.textHandler, this.imageRenderer);
+      this.results[index] = new result(id, this.textHandler, this.imageHandler);
       this.results[index].text = this.loadingText;
       this.results[index].image = this.loadingImage;
 
       // Attempt to get the text for this
-      this.getText(`${this.baseUrl}/${id}/${this.filename.text}`, index); 
+      this.requestText(`${this.baseUrl}/${id}/${this.filename.text}`, index); 
       if (!this.foundAll && endId !== false && endId === (id - 1)) 
       { this.reachedEnd(true);  } 
       else if(!this.foundAll) 
@@ -96,7 +96,7 @@ export default class hostFolder {
     this.textRenderer(id, text, this.containerId, this.container);
   }
 
-  imageHandler = (id, text) => {
+  imageHandler = (id, url) => {
     if (this.noContainer()) return false;
     if (document.getElementById(`hostFolder_${id}`) === null) {
       this.cardRenderer(id, this.containerId, this.container);
@@ -129,18 +129,6 @@ export default class hostFolder {
   }
 
   // ***************** Loaders
-  getText(url, index) {
-    let request = new XMLHttpRequest();
-    request.open("GET", url, false) // Request the text file, sync to keep with the while loop
-    request.onreadystatechange = () => {
-      if(request.readyState === 4 && request.status === 200) {
-        this.results[index].text = request.responseText // It exists, add it to result with backup image
-      } else if (request.readyState === 4 && request.status !== 200){
-        this.foundAll = true // The server did not give a 200, no more content discovered
-      }
-    };
-    request.send();
-  }
 
   getLoadingImage = (callback = (base64) => {}) => {
     if(this.loadingImage){ return this.loadingImage; }
@@ -166,10 +154,24 @@ export default class hostFolder {
       this.results[index].image = this.getBackupImage((base64)=> {this.results[index].image = base64}) // The server did not give a 200, no more content discovered
     }, () => {
       this.hasCompleted++;
+      console.log(this.hasCompleted)
       if(this.results.length === this.hasCompleted){
         this.imageCompleted(this.results, this.hasCompleted, this.containerId, this.container);
       }
     })
+  }
+
+  requestText(url, index) {
+    let request = new XMLHttpRequest();
+    request.open("GET", url, false) // Request the text file, sync to keep with the while loop
+    request.onreadystatechange = () => {
+      if(request.readyState === 4 && request.status === 200) {
+        this.results[index].text = request.responseText // It exists, add it to result with backup image
+      } else if (request.readyState === 4 && request.status !== 200){
+        this.foundAll = true // The server did not give a 200, no more content discovered
+      }
+    };
+    request.send();
   }
   
   requestImage = (url, success = (data) => {}, error = () => {}, always = () => {}) => {
@@ -181,7 +183,8 @@ export default class hostFolder {
         { success(this.binaryToBase64(request.response)) } 
       else if (request.readyState === 4 && request.status !== 200) 
         { error(); }
-      always();
+      if (request.readyState === 4 )
+        { always();  }
     };
     request.send();
   }

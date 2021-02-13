@@ -29,7 +29,7 @@ export default function myHostFolder(containerId, range) {
         // Create container with text and empty image
         $container.append(`
                 <div class="col-md-3" id="hostFolder_${id}">
-                    <p class="host-folder-text">${text}</p>
+                    <p class="host-folder-text"></p>
                     <img class="host-folder-image d-none img-fluid">
                 </div>`)
     }
@@ -42,13 +42,11 @@ export default function myHostFolder(containerId, range) {
 
     // Same thing is possible with the image on change
     folder.imageRenderer = (id, url) => {
-        if (folder.noContainer()) return false;
         // Update image source and remove hiding class
         $(`#hostFolder_${id} .host-folder-image`).attr('src', url).removeClass('d-none')
     }
 
     folder.textCompleted = (results, total) => {
-        if (folder.noContainer()) return false;
         // Remove the looking for more text since we reached the end
         $(`#hostFolder_${results[total - 1].id + 1}`).remove();
     }
@@ -59,12 +57,15 @@ export default function myHostFolder(containerId, range) {
         console.log(`Fetched all data from ${total} entries`)
         console.log(results)
 
-        // Manual updates of values will trigger the render function
-        folder.requestImage( "/hostFolder/img/noImage.jpg", (base64) => {
-            folder.results[0].image = base64;
+        // Manual updates of values will trigger the render function, urls still work
+        results[0].image =  "/hostFolder/img/noImage.jpg";
+
+        // it can also be loaded specifically
+        folder.results[1].image =  folder.loadingImage; // set loading image from cached base64
+        folder.requestImage( "/hostFolder/img/loadingImage.jpg", (base64) => {
+            folder.results[1].image = base64; // update with new image result
         })
     }
-
 
     // load the content and save it into results
     // lazy loaded images will get updated once server responds and can be found in folder.results
@@ -75,9 +76,6 @@ export default function myHostFolder(containerId, range) {
     // If nothing is supplied, it will assume id 1 is first and load everything after
     // or simply folder.load();
     folder.load(...range);
-
-    // Manual updates of values will trigger the render function
-    folder.results[0].text = "updated text";
 
     return folder;
 }
