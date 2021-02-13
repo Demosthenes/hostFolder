@@ -57,7 +57,12 @@ export default function myHostFolder(containerId, range) {
         // All images are fully loaded
         console.log(`Fetched all data from ${total} entries`)
         console.log(results)
-
+        
+        // Update contents after 5 seconds
+        setTimeout(function(){
+            folder.load(...range);
+        }, 5000)
+        
         // Manual updates of values will trigger the render function, urls still work
         results[0].image =  "/hostFolder/img/noImage.jpg";
 
@@ -66,9 +71,10 @@ export default function myHostFolder(containerId, range) {
         folder.requestImage( "/hostFolder/img/loadingImage.jpg", (base64) => {
             folder.results[1].image = base64; // update with new image result
         })
+        
     }
-
     */
+ 
     // load the content and save it into results
     // lazy loaded images will get updated once server responds and can be found in folder.results
 
@@ -78,6 +84,7 @@ export default function myHostFolder(containerId, range) {
     // If nothing is supplied, it will assume id 1 is first and load everything after
     // or simply folder.load();
     folder.load(...range);
+    
 
     return folder;
 }

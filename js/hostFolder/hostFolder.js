@@ -47,7 +47,7 @@ export default class hostFolder {
 
   // Search and return any content
   load(startId = 1, endId = false) {
-    if(!this.loadingImage){ this.getLoadingImage(()=>{this.load(startId,endId)}) } // Make sure the loading image has loaded
+    if(!this.loadingImage){ return this.getLoadingImage(()=>{this.load(startId,endId)}) } // Make sure the loading image has loaded
     let id = startId; id--;
     this.reset(this.container);
     while (!this.foundAll && ++id) {
@@ -108,7 +108,7 @@ export default class hostFolder {
     let card = document.createElement("div");
     card.id = `hostFolder_${id}`
     card.className = `col-md-3`
-    card.innerHTML = `<p class="host-folder-text"></p><img class="host-folder-image img-fluid">`
+    card.innerHTML = `<p class="host-folder-text"></p><img style="display:none;" class="host-folder-image img-fluid">`
     container.appendChild(card)
   }
 
@@ -117,7 +117,9 @@ export default class hostFolder {
   }
 
   imageRenderer = (id, url, containerId, container) => {
-    document.querySelector(`#hostFolder_${id} .host-folder-image`).src = url
+    let img = document.querySelector(`#hostFolder_${id} .host-folder-image`);
+    img.src = url;
+    img.style.display = "";
   }
 
   textCompleted = (results, total, containerId, container) => {
@@ -154,6 +156,10 @@ export default class hostFolder {
       this.results[index].image = this.getBackupImage((base64)=> {this.results[index].image = base64}) // The server did not give a 200, no more content discovered
     }, () => {
       this.hasCompleted++;
+      console.log("leng")
+      console.log(this.results.length)
+      console.log("hascomp")
+      console.log(this.hasCompleted)
       if(this.results.length === this.hasCompleted){
         this.imageCompleted(this.results, this.hasCompleted, this.containerId, this.container);
       }
@@ -183,7 +189,7 @@ export default class hostFolder {
       else if (request.readyState === 4 && request.status !== 200) 
         { error(); }
       if (request.readyState === 4 )
-        { always();  }
+        { always(); console.log(request) }
     };
     request.send();
   }
