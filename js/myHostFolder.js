@@ -71,7 +71,6 @@ export default function myHostFolder(containerId, range) {
         folder.requestImage( "/hostFolder/img/loadingImage.jpg", (base64) => {
             folder.results[1].image = base64; // update with new image result
         })
-        
     }
     */
  
