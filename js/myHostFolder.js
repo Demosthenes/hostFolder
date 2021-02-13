@@ -6,7 +6,7 @@
 
 import hostFolder from './hostFolder/hostFolder.js'
 
-export default function myHostFolder ($container, range) {
+export default function myHostFolder (containerId, range) {
     // create new loader
     let folder = new hostFolder({
         baseUrl: "/hostFolder/content",
@@ -19,7 +19,7 @@ export default function myHostFolder ($container, range) {
             backupImage: "/hostFolder/img/noImage.jpg",
         },
         loadingText: "Checking for more posts...",
-        $container
+        container : containerId
     });
 
     // load the content

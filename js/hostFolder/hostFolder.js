@@ -19,7 +19,7 @@ export default class hostFolder {
    * @param {string} filepath.loadingImage  The path to your loading image, relative to baseUrl
    * @param {string} filepath.backupImage  The path to your not found image, relative to baseUrl
    * @param {string} loadingText  What should the text say while loading new results?
-   * @param {Object} $container  A reference to a jquery selector for the container you want the content in
+   * @param {Object} container  A reference to a jquery selector for the container you want the content in
    */
 
   constructor({
@@ -33,91 +33,29 @@ export default class hostFolder {
       backupImage: "noImage.jpg",
     },
     loadingText = "Checking for more posts...",
-    $container = null
+    container = null
   }) {
     this.baseUrl = baseUrl;
     this.filename = filename;
     this.filepath = filepath;
     this.loadingText = loadingText;
-    this.$container = $container;
-    this.prefetchLoadingImage();
-  }
-
-  prefetchLoadingImage = () => $.get({ url: this.filepath.loadingImage, async: false})
-
-  noContainer = () => this.$container === null || !this.$container.length
-
-  textRenderer = (id, text) => {
-    if (this.noContainer()) return false;
-    if ($(`#hostFolder_${id}`).length) {
-      $(`#hostFolder_${id} .host-folder-text`).text(text).removeClass('d-none')
-    } else {
-      this.$container.append(`
-        <div class="col-md-3" id="hostFolder_${id}">
-          <p class="host-folder-text">${text}</p>
-          <img class="host-folder-image d-none img-fluid">
-        </div>`)
-    }
-  }
-
-  imageRenderer = (id, url) => {
-    if (this.noContainer()) return false;
-    $(`#hostFolder_${id} .host-folder-image`).attr('src', url).removeClass('d-none')
-  }
-
-  textCompleted = (results, total) => {
-    if (this.noContainer()) return false;
-    $(`#hostFolder_${results[total-1].id + 1}`).remove();
-  }
-
-  imageCompleted = (results, total) => {
-    if (this.noContainer()) return false;
-  }
-
-  reset = ($container) => {
-    this.results = [];
-    this.hasCompleted = 0;
-    this.foundAll = false;
-    $container.children().remove();
-  }
-
-  getText(url, index) {
-    $.get({
-      url,
-      async: false, // Request the text file, sync to keep with the while loop
-      success: (data) => (this.results[index].text = data), // It exists, add it to result with backup image
-      error: () => (this.foundAll = true), // The server did not give a 200, no more content discovered
-    })
-  }
-
-  getImage(url, index) {
-    $.get({
-      url, // Request the image file asych with filler until downlaoded
-      success: () => (this.results[index].image = url), // Image found on server, add it
-      error: () => (this.results[index].image = this.filepath.backupImage), // Image not found, use backup image
-    }).always(()=>{
-      this.hasCompleted++;
-      if(this.results.length === this.hasCompleted) this.imageCompleted(this.results, this.hasCompleted);
-    })
-  }
-
-  reachedEnd(forceStop = false) {
-    this.results.pop();
-    this.textCompleted(this.results, this.results.length);
-    if(forceStop){ this.foundAll = true; }
+    this.containerId = container;
+    this.container = document.getElementById(container);
+    this.backupImage = false;
+    this.loadingImage = false;
   }
 
   // Search and return any content
   load(startId = 1, endId = false) {
-    let id = startId;
-    id--;
-    this.reset(this.$container);
+    if(!this.loadingImage){ this.getLoadingImage(()=>{this.load(startId,endId)}) } // Make sure the loading image has loaded
+    let id = startId; id--;
+    this.reset(this.container);
     while (!this.foundAll && ++id) {
       // Loop until we no longer find a valid 200 response
       let index = id - startId; // Make sure the array starts at 0 and offsets from start
-      this.results[index] = new result(id, this.textRenderer, this.imageRenderer);
+      this.results[index] = new result(id, this.textHandler, this.imageRenderer);
       this.results[index].text = this.loadingText;
-      this.results[index].image = this.filepath.loadingImage;
+      this.results[index].image = this.loadingImage;
 
       // Attempt to get the text for this
       this.getText(`${this.baseUrl}/${id}/${this.filename.text}`, index); 
@@ -130,5 +68,128 @@ export default class hostFolder {
     }
     return this.results;
   }
+  
+  // ***************** Helpers
+  noContainer = () => this.container === null
+
+  reset = (container) => {
+    this.results = [];
+    this.hasCompleted = 0;
+    this.foundAll = false;
+    while (container.firstChild) {
+      container.removeChild(container.lastChild);
+    }
+  }
+
+  reachedEnd(forceStop = false) {
+    this.results.pop();
+    this.textCompleted(this.results, this.results.length, this.containerId, this.container);
+    if(forceStop){ this.foundAll = true; }
+  }
+
+  // ***************** Renderers
+  textHandler = (id, text) => {
+    if (this.noContainer()) return false;
+    if (document.getElementById(`hostFolder_${id}`) === null) {
+      this.cardRenderer(id, this.containerId, this.container);
+    }
+    this.textRenderer(id, text, this.containerId, this.container);
+  }
+
+  imageHandler = (id, text) => {
+    if (this.noContainer()) return false;
+    if (document.getElementById(`hostFolder_${id}`) === null) {
+      this.cardRenderer(id, this.containerId, this.container);
+    }
+    this.imageRenderer(id, url, this.containerId, this.container);
+  }
+  
+  cardRenderer = (id, containerId, container) => {
+    let card = document.createElement("div");
+    card.id = `hostFolder_${id}`
+    card.className = `col-md-3`
+    card.innerHTML = `<p class="host-folder-text"></p><img class="host-folder-image img-fluid">`
+    this.container.appendChild(card)
+  }
+
+  textRenderer = (id, text, containerId, container) => {
+    document.querySelector(`#hostFolder_${id} .host-folder-text`).innerText = text
+  }
+
+  imageRenderer = (id, url, containerId, container) => {
+    document.querySelector(`#hostFolder_${id} .host-folder-image`).src = url
+  }
+
+  textCompleted = (results, total, containerId, container) => {
+    let textContainer = document.getElementById(`hostFolder_${results[total-1].id + 1}`);
+    textContainer.parentNode.removeChild(textContainer);
+  }
+
+  imageCompleted = (results, total, containerId, container) => {
+  }
+
+  // ***************** Loaders
+  getText(url, index) {
+    let request = new XMLHttpRequest();
+    request.open("GET", url, false) // Request the text file, sync to keep with the while loop
+    request.onreadystatechange = () => {
+      if(request.readyState === 4 && request.status === 200) {
+        this.results[index].text = request.responseText // It exists, add it to result with backup image
+      } else {
+        this.foundAll = true // The server did not give a 200, no more content discovered
+      }
+    };
+    request.send();
+  }
+
+  getLoadingImage = (callback = (base64) => {}) => {
+    if(this.loadingImage){ return this.loadingImage; }
+    this.requestImage( this.filepath.loadingImage, (base64) => {
+      this.loadingImage = base64
+      callback(base64);
+    })
+  }
+
+  getBackupImage = (callback = (base64) => {}) => {
+    if(this.backupImage){ return this.backupImage; }
+    this.requestImage( this.filepath.backupImage, (base64) => {
+      this.backupImage = base64
+      callback(base64);
+    })
+    return this.getLoadingImage();
+  }
+
+  getImage(url, index) {
+    this.requestImage( url, (base64) => {
+      this.results[index].image = base64 // It exists, add it to result with backup image
+    }, () => {
+      this.results[index].image = this.getBackupImage((base64)=> {this.results[index].image = base64}) // The server did not give a 200, no more content discovered
+    }, () => {
+      this.hasCompleted++;
+      if(this.results.length === this.hasCompleted){
+        this.imageCompleted(this.results, this.hasCompleted, this.containerId, this.container);
+      }
+    })
+  }
+  
+  requestImage = (url, success = (data) => {}, error = () => {}, always = () => {}) => {
+    let request = new XMLHttpRequest();
+    request.responseType = 'arraybuffer';
+    request.open("GET", url) // Request the text file, sync to keep with the while loop
+    request.onreadystatechange = () => {
+      if(request.readyState === 4 && request.status === 200) 
+        { success(this.binaryToBase64(request.response)) } 
+      else if (request.readyState === 4 && request.status !== 200) 
+        { error(); }
+      always();
+    };
+    request.send();
+  }
+
+  binaryToBase64 = (bin) => {
+    let uInt8Array = new Uint8Array(bin), i = uInt8Array.length, biStr = new Array(i);
+    while (i--) { biStr[i] = String.fromCharCode(uInt8Array[i]); }
+    return `data:image/jpg;base64,${btoa(biStr.join(''))}`;
+  } 
 }
 
