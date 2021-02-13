@@ -135,7 +135,7 @@ export default class hostFolder {
     request.onreadystatechange = () => {
       if(request.readyState === 4 && request.status === 200) {
         this.results[index].text = request.responseText // It exists, add it to result with backup image
-      } else {
+      } else if (request.readyState === 4 && request.status !== 200){
         this.foundAll = true // The server did not give a 200, no more content discovered
       }
     };
