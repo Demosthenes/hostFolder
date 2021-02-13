@@ -1,6 +1,6 @@
 import hostFolder from './hostFolder/hostFolder.js'
 
-export default function myHostFolder ($container) {
+export default function myHostFolder ($container, range) {
     // create new loader
     let folder = new hostFolder({
         baseUrl: "/hostFolder/content",
@@ -17,7 +17,7 @@ export default function myHostFolder ($container) {
     });
 
     // load the content
-    folder.load(); 
+    folder.load(...range); 
     
     return folder;
 }

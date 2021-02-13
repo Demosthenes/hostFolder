@@ -74,6 +74,13 @@ export default class hostFolder {
     if (this.noContainer()) return false;
   }
 
+  reset = ($container) => {
+    this.results = [];
+    this.hasCompleted = 0;
+    this.foundAll = false;
+    $container.children().remove();
+  }
+
   getText(url, index) {
     $.get({
       url,
@@ -103,34 +110,25 @@ export default class hostFolder {
   // Search and return any content
   load(startId = 1, endId = false) {
     let id = startId;
-    this.results = [];
-    this.hasCompleted = 0;
-    this.foundAll = false;
-    while (!this.foundAll) {
+    id--;
+    this.reset(this.$container);
+    while (!this.foundAll && ++id) {
       // Loop until we no longer find a valid 200 response
       let index = id - startId; // Make sure the array starts at 0 and offsets from start
-
       this.results[index] = new result(id, this.textRenderer, this.imageRenderer);
       this.results[index].text = this.loadingText;
       this.results[index].image = this.filepath.loadingImage;
 
       // Attempt to get the text for this
       this.getText(`${this.baseUrl}/${id}/${this.filename.text}`, index); 
-
-      if (!this.foundAll && endId !== false && endId === (id - 1)) {
-        this.reachedEnd(true);
-      } 
-      else if(!this.foundAll) {
-        this.getImage(`${this.baseUrl}/${id}/${this.filename.image}`, index);
-      }
-      else {
-        this.reachedEnd(false);
-      }
-      
-      id++; 
-
+      if (!this.foundAll && endId !== false && endId === (id - 1)) 
+      { this.reachedEnd(true);  } 
+      else if(!this.foundAll) 
+      { this.getImage(`${this.baseUrl}/${id}/${this.filename.image}`, index); }
+      else 
+      { this.reachedEnd(false); }
     }
     return this.results;
-  };
+  }
 }
 
