@@ -1,3 +1,9 @@
+/***
+* @author  Mikael Hellsen
+* @version 0.9
+* @since   2021-02-11 
+*/
+
 import myHostFolder from './myHostFolder.js'
 
 $(document).ready(function () {

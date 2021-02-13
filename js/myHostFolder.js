@@ -1,3 +1,9 @@
+/***
+* @author  Mikael Hellsen
+* @version 0.9
+* @since   2021-02-11 
+*/
+
 import hostFolder from './hostFolder/hostFolder.js'
 
 export default function myHostFolder ($container, range) {
