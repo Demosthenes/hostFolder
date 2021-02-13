@@ -109,7 +109,7 @@ export default class hostFolder {
     card.id = `hostFolder_${id}`
     card.className = `col-md-3`
     card.innerHTML = `<p class="host-folder-text"></p><img class="host-folder-image img-fluid">`
-    this.container.appendChild(card)
+    container.appendChild(card)
   }
 
   textRenderer = (id, text, containerId, container) => {

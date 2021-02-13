@@ -21,9 +21,8 @@ Any usage of this code, by anyone, in perpetuity, is fully on their own risk.
 # [Demo](http://mikaelhellsen.com/hostFolder/)  
 
   
-# Dependencies
+# Dependencies (none really)
 - Webserver (otherwise there are cors errors in javascript modules)
-- Jquery
 - Bootstrap (recommended, not required)
 
 
@@ -44,13 +43,13 @@ Whenever the data is changed the Renderer function will run.
 ```javascript
 import hostFolder from './hostFolder/hostFolder.js'
 
-// Wait for jquery to get ready
+// Wait for jquery to get ready (Jquery not required, but used here)
 $(document).ready(function () {
 
     // Define the location
-    let $container = $('#gallery')
+    let containerId = 'gallery'
 
-    // Create new hostFolder by setting options
+    // create new loader
     let folder = new hostFolder({
         baseUrl: "/hostFolder/content",
         filename: {
@@ -62,39 +61,38 @@ $(document).ready(function () {
             backupImage: "/hostFolder/img/noImage.jpg",
         },
         loadingText: "Checking for more posts...",
-        $container
+        container: containerId
     });
 
-    // What happens once the data is changed?
-    folder.textRenderer = (id, text) => {
-        console.log("text changed: " + text)
+    let $container = $(`#${containerId}`);
 
-        // Default code to handle results
-        if (folder.noContainer()) return false;
-        if ($(`#hostFolder_${id}`).length) {
-            // Update text field
-            $(`#hostFolder_${id} .host-folder-text`).text(text)
-        } else {
-            // Create container with text and empty image
-            $container.append(`
+    // What happens once the data is changed?
+    folder.cardRenderer = (id, text) => {
+        // Create container with text and empty image
+        $container.append(`
                 <div class="col-md-3" id="hostFolder_${id}">
                     <p class="host-folder-text">${text}</p>
                     <img class="host-folder-image d-none img-fluid">
                 </div>`)
-        }
     }
-    
+
+    // What happens once the data is changed?
+    folder.textRenderer = (id, text) => {
+        // Update text field
+        $(`#hostFolder_${id} .host-folder-text`).text(text)
+    }
+
     // Same thing is possible with the image on change
     folder.imageRenderer = (id, url) => {
         if (folder.noContainer()) return false;
         // Update image source and remove hiding class
         $(`#hostFolder_${id} .host-folder-image`).attr('src', url).removeClass('d-none')
-      }
+    }
 
-    folder.textCompleted  = (results, total) => {
+    folder.textCompleted = (results, total) => {
         if (folder.noContainer()) return false;
         // Remove the looking for more text since we reached the end
-        $(`#hostFolder_${results[total-1].id + 1}`).remove();
+        $(`#hostFolder_${results[total - 1].id + 1}`).remove();
     }
 
     // When everything has fully loaded
@@ -104,7 +102,9 @@ $(document).ready(function () {
         console.log(results)
 
         // Manual updates of values will trigger the render function
-        results[0].image = "/hostFolder/img/noImage.jpg"; 
+        folder.requestImage( "/hostFolder/img/noImage.jpg", (base64) => {
+            folder.results[0].image = base64;
+        })
     }
 
     // load the content and save it into results
@@ -114,10 +114,13 @@ $(document).ready(function () {
     // .load(5) will load images in folder 5 and dynamically until nothing more exists
     // .load(1,10) will load images in folder 1 to and with folder 10 (assuming 10 exists, otherwise it exists at the last image)
     // If nothing is supplied, it will assume id 1 is first and load everything after
-    let textResults = folder.load(); // or simply folder.load();
+    // or simply folder.load();
+    folder.load(...range);
 
     // Manual updates of values will trigger the render function
-    folder.results[0].text = "updated text"; 
+    folder.results[0].text = "updated text";
+
+    return folder;
 });
 ```
 
@@ -141,16 +144,20 @@ The construction options are:
 The listeners available are:
 
 ```javascript
+
+  // Render the card that fills with text/image
+  cardRenderer = (id, text, containerId, container) => {  }
+
   // Once the text is found
-  textRenderer = (id, text) => {  }
+  textRenderer = (id, text, containerId, container) => {  }
   
   // The image has lazyloaded and is now available
-  imageRenderer = (id, url) => {  }
+  imageRenderer = (id, url, containerId, container) => {  }
 
   // We reached the end, nothing found so clean the loadingtext
-  textCompleted = (results, total) => { }
+  textCompleted = (results, total, containerId, container) => { }
   
   // All folders have been searched through and images fully loaded
-  imageCompleted = (results, total) =>  { }
+  imageCompleted = (results, total, containerId, container) =>  { }
 
 ```

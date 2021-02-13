@@ -60,11 +60,11 @@ export default function myHostFolder(containerId, range) {
         console.log(results)
 
         // Manual updates of values will trigger the render function
-        results[0].image = "/hostFolder/img/noImage.jpg";
+        folder.requestImage( "/hostFolder/img/noImage.jpg", (base64) => {
+            folder.results[0].image = base64;
+        })
     }
 
-    // Manual updates of values will trigger the render function
-    folder.results[0].text = "updated text";
 
     // load the content and save it into results
     // lazy loaded images will get updated once server responds and can be found in folder.results
@@ -75,6 +75,9 @@ export default function myHostFolder(containerId, range) {
     // If nothing is supplied, it will assume id 1 is first and load everything after
     // or simply folder.load();
     folder.load(...range);
+
+    // Manual updates of values will trigger the render function
+    folder.results[0].text = "updated text";
 
     return folder;
 }
