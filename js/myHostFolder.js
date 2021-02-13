@@ -22,6 +22,7 @@ export default function myHostFolder(containerId, range) {
         container: containerId
     });
 
+    /**
     let $container = $(`#${containerId}`);
 
     // What happens once the data is changed?
@@ -67,6 +68,7 @@ export default function myHostFolder(containerId, range) {
         })
     }
 
+    */
     // load the content and save it into results
     // lazy loaded images will get updated once server responds and can be found in folder.results
 

@@ -154,7 +154,6 @@ export default class hostFolder {
       this.results[index].image = this.getBackupImage((base64)=> {this.results[index].image = base64}) // The server did not give a 200, no more content discovered
     }, () => {
       this.hasCompleted++;
-      console.log(this.hasCompleted)
       if(this.results.length === this.hasCompleted){
         this.imageCompleted(this.results, this.hasCompleted, this.containerId, this.container);
       }
