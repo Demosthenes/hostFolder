@@ -83,7 +83,6 @@ export default function myHostFolder(containerId, range) {
     // If nothing is supplied, it will assume id 1 is first and load everything after
     // or simply folder.load();
     folder.load(...range);
-    
 
     return folder;
 }

@@ -88,6 +88,7 @@ export default class hostFolder {
   }
 
   // ***************** Renderers
+  
   textHandler = (id, text) => {
     if (this.noContainer()) return false;
     if (document.getElementById(`hostFolder_${id}`) === null) {
@@ -103,8 +104,8 @@ export default class hostFolder {
     }
     this.imageRenderer(id, url, this.containerId, this.container);
   }
-  
-  cardRenderer = (id, containerId, container) => {
+
+  defaultCardRenderer = (id, containerId, container) => {
     let card = document.createElement("div");
     card.id = `hostFolder_${id}`
     card.className = `col-md-3`
@@ -112,23 +113,29 @@ export default class hostFolder {
     container.appendChild(card)
   }
 
-  textRenderer = (id, text, containerId, container) => {
+  defaultTextRenderer = (id, text, containerId, container) => {
     document.querySelector(`#hostFolder_${id} .host-folder-text`).innerText = text
   }
 
-  imageRenderer = (id, url, containerId, container) => {
+  defaultImageRenderer = (id, url, containerId, container) => {
     let img = document.querySelector(`#hostFolder_${id} .host-folder-image`);
     img.src = url;
     img.style.display = "";
   }
 
-  textCompleted = (results, total, containerId, container) => {
+  defaultTextCompleted = (results, total, containerId, container) => {
     let textContainer = document.getElementById(`hostFolder_${results[total-1].id + 1}`);
     textContainer.parentNode.removeChild(textContainer);
   }
 
-  imageCompleted = (results, total, containerId, container) => {
+  defaultImageCompleted = (results, total, containerId, container) => {
   }
+
+  cardRenderer   = this.defaultCardRenderer;
+  textRenderer   = this.defaultTextRenderer;
+  imageRenderer  = this.defaultImageRenderer;
+  textCompleted  = this.defaultTextCompleted;
+  imageCompleted = this.defaultImageCompleted;
 
   // ***************** Loaders
 
@@ -150,12 +157,11 @@ export default class hostFolder {
   }
 
   getImage(url, index) {
-    this.requestImage( url, (base64) => {
-      this.results[index].image = base64 // It exists, add it to result with backup image
-    }, () => {
-      this.results[index].image = this.getBackupImage((base64)=> {this.results[index].image = base64}) // The server did not give a 200, no more content discovered
-    }, () => {
-      this.hasCompleted++;
+    this.requestImage( url, 
+      (base64) => { this.results[index].image = base64 },
+      () => { this.results[index].image = this.getBackupImage((base64)=> {this.results[index].image = base64}) },
+      () => {
+        this.hasCompleted++;
       if(this.results.length === this.hasCompleted){
         this.imageCompleted(this.results, this.hasCompleted, this.containerId, this.container);
       }
@@ -180,12 +186,11 @@ export default class hostFolder {
     request.responseType = 'arraybuffer';
     request.open("GET", url) // Request the text file, sync to keep with the while loop
     request.onreadystatechange = () => {
-      if(request.readyState === 4 && request.status === 200) 
-        { success(this.binaryToBase64(request.response)) } 
-      else if (request.readyState === 4 && request.status !== 200) 
-        { error(); }
-      if (request.readyState === 4 )
-        { always(); }
+      if (request.readyState === 4 ) { 
+        if(request.status === 200)       { success(this.binaryToBase64(request.response)) } 
+        else if (request.status !== 200) { error(); }
+        always(); 
+      }
     };
     request.send();
   }
@@ -196,4 +201,3 @@ export default class hostFolder {
     return `data:image/jpg;base64,${btoa(biStr.join(''))}`;
   } 
 }
-
