@@ -43,13 +43,15 @@ export default class hostFolder {
     this.container = document.getElementById(container);
     this.backupImage = false;
     this.loadingImage = false;
+    this.results = [];
+    this.hasCompleted = 0;
   }
 
   // Search and return any content
   load(startId = 1, endId = false) {
     if(!this.loadingImage){ return this.getLoadingImage(()=>{this.load(startId,endId)}) } // Make sure the loading image has loaded
     let id = startId; id--;
-    this.reset(this.container);
+    this.foundAll = false;
     while (!this.foundAll && ++id) {
       // Loop until we no longer find a valid 200 response
       let index = id - startId; // Make sure the array starts at 0 and offsets from start
@@ -71,15 +73,6 @@ export default class hostFolder {
   
   // ***************** Helpers
   noContainer = () => this.container === null
-
-  reset = (container) => {
-    this.results = [];
-    this.hasCompleted = 0;
-    this.foundAll = false;
-    while (container.firstChild) {
-      container.removeChild(container.lastChild);
-    }
-  }
 
   reachedEnd(forceStop = false) {
     this.results.pop();
