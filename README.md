@@ -41,7 +41,7 @@ Listeners can be applied to the text and image.
 Whenever the data is changed the Renderer function will run.  
 
 ```javascript
-import hostFolder from './hostFolder/hostFolder.js'
+import HostFolder from './hostFolder/HostFolder.js'
 
 // Wait for jquery to get ready (Jquery not required, but used here)
 $(document).ready(function () {
@@ -50,7 +50,7 @@ $(document).ready(function () {
     let containerId = 'gallery'
 
     // create new loader
-    let folder = new hostFolder({
+    let folder = new HostFolder({
         baseUrl: "/hostFolder/content",
         filename: {
             text: "text.txt",

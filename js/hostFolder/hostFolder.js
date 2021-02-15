@@ -59,23 +59,26 @@ export default class HostFolder {
   // Search and return any content
   load(startId = 1, endId = false) {
     if(!this.loadingImage){ return this.getLoadingImage(()=>{this.load(startId,endId)}) } // Make sure the loading image has loaded
-    let id = startId; id--;
+    let id = startId, result; id--;
     this.foundAll = false;
     while (!this.foundAll && ++id) { // Loop until we no longer find a valid 200 response
       let index = id - startId;      // Make sure the array starts at 0 and offsets from start
-      this.results[index] = this.createResult(id);
-      this.getText(`${this.baseUrl}/${id}/${this.filename.text}`, index);  // Attempt to get the text for this
+      this.results[index] = result = this.createResult(id);
+      this.getText(this.textUrl(id), result);  // Attempt to get the text for this
       if (!this.foundAll && endId !== false && endId === (id - 1)) 
-      { this.reachedEnd(true);  } 
+      { this.endHandler(true);  } 
       else if(!this.foundAll) 
-      { this.getImage(`${this.baseUrl}/${id}/${this.filename.image}`, index); }
+      { this.getImage(this.imageUrl(id), result); }
       else 
-      { this.reachedEnd(false); };
+      { this.endHandler(false); };
     };
     return this.results;
   };
 
   // ***************** Helpers
+  textUrl  = id => `${this.baseUrl}/${id}/${this.filename.text}`;
+  imageUrl = id => `${this.baseUrl}/${id}/${this.filename.image}`;
+
   createResult = (id) => {
     let result = new Result(this.textHandler, this.imageHandler);
     result.id = id;
@@ -86,30 +89,44 @@ export default class HostFolder {
 
   missingElement = (query) => document.querySelector(query) === null
 
-  reachedEnd(forceStop = false) {
-    this.results.pop();
-    this.textCompleted(this.results, this.results.length, this.containerId, this.container);
-    if(forceStop){ this.foundAll = true; };
-  };
-
   // ***************** Handle listeners
   textHandler = (id, text) => {
     if (this.missingElement(`#${this.containerId}`)) return false;
-    if (this.missingElement(`#${this.containerId} #hostFolder_${id}`)) {
-      this.cardRenderer(id, this.containerId, this.container);
-    };
+    if (this.missingElement(`#${this.containerId} #hostFolder_${id}`)) { this.cardRenderer(id, this.containerId, this.container); };
     this.textRenderer(id, text, this.containerId, this.container);
   }
 
   imageHandler = (id, url) => {
     if (this.missingElement(`#${this.containerId}`)) return false;
-    if (this.missingElement(`#${this.containerId} #hostFolder_${id}`)) {
-      this.cardRenderer(id, this.containerId, this.container);
-    };
+    if (this.missingElement(`#${this.containerId} #hostFolder_${id}`)) { this.cardRenderer(id, this.containerId, this.container); };
     this.imageRenderer(id, url, this.containerId, this.container);
+  };
+  
+  endHandler(forceStop = false) {
+    this.results.pop();
+    this.textCompleted(this.results, this.results.length, this.containerId, this.container);
+    if(forceStop){ this.foundAll = true; };
   };
 
   // ***************** Data Loaders
+  getText(url, result) {
+    loader.requestText( url, 
+      (text) => { result.text = text;   },
+      ()     => { this.foundAll = true; }
+    );
+  };
+
+  getImage(url, result) {
+    loader.requestImage( url, 
+      (base64) => { result.image = base64; },
+      ()       => { result.image = this.getBackupImage((base64)=> {result.image = base64}); },
+      ()       => { if(this.hasCompleted++ && this.results.length === this.hasCompleted) {
+                      this.imageCompleted(this.results, this.hasCompleted, this.containerId, this.container);
+                    };
+                  }
+      );
+  };
+
   getLoadingImage = (callback = (base64) => {}) => {
     if(this.loadingImage){ return this.loadingImage; }
     loader.requestImage( this.filepath.loadingImage, (base64) => { this.loadingImage = base64; callback(base64);});
@@ -119,24 +136,5 @@ export default class HostFolder {
     if(this.backupImage){ return this.backupImage; }
     loader.requestImage( this.filepath.backupImage, (base64) => { this.backupImage = base64; callback(base64);});
     return this.getLoadingImage();
-  };
-
-  getImage(url, index) {
-    loader.requestImage( url, 
-      (base64) => { this.results[index].image = base64; },
-      ()       => { this.results[index].image = this.getBackupImage((base64)=> {this.results[index].image = base64}); },
-      ()       => { this.hasCompleted++;
-                    if(this.results.length === this.hasCompleted) {
-                      this.imageCompleted(this.results, this.hasCompleted, this.containerId, this.container);
-                    };
-                  }
-      );
-  };
-
-  getText(url, index) {
-    loader.requestText( url, 
-      (text) => { this.results[index].text = text; },
-      ()     => { this.foundAll = true;            }
-    );
   };
 }
