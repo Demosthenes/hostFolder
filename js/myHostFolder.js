@@ -4,11 +4,11 @@
 * @since   2021-02-11 
 */
 
-import hostFolder from './hostFolder/hostFolder.js'
+import HostFolder from './hostFolder/HostFolder.js'
 
 export default function myHostFolder(containerId, range) {
     // create new loader
-    let folder = new hostFolder({
+    let folder = new HostFolder({
         baseUrl: "/hostFolder/content",
         filename: {
             text: "text.txt",

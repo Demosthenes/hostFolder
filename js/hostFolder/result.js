@@ -7,9 +7,9 @@
 * @since   2021-02-11 
 */
 
-export default class result {
-  constructor(id, textListener, imageListener) {
-    this.id = id;
+export default class Result {
+  constructor(textListener, imageListener) {
+    this.id = "";
     this.textInternal = "";
     this.imageInternal = "";
     this.textListener = textListener;

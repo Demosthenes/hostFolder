@@ -8,11 +8,11 @@
 * @since   2021-02-11 
 */
 
-import result from './result.js';
+import Result from './result.js';
 import * as loader from './loader.js';
 import * as defaultRenderers from './defaultRenderers.js';
 
-export default class hostFolder {
+export default class HostFolder {
      /**
    * This is the main class to use the module
    * @param {string} baseUrl This url will be used as a base location when creating paths
@@ -63,9 +63,7 @@ export default class hostFolder {
     this.foundAll = false;
     while (!this.foundAll && ++id) { // Loop until we no longer find a valid 200 response
       let index = id - startId;      // Make sure the array starts at 0 and offsets from start
-      this.results[index] = new result(id, this.textHandler, this.imageHandler);
-      this.results[index].text = this.loadingText;
-      this.results[index].image = this.loadingImage;
+      this.results[index] = this.createResult(id);
       this.getText(`${this.baseUrl}/${id}/${this.filename.text}`, index);  // Attempt to get the text for this
       if (!this.foundAll && endId !== false && endId === (id - 1)) 
       { this.reachedEnd(true);  } 
@@ -76,8 +74,16 @@ export default class hostFolder {
     };
     return this.results;
   };
-  
+
   // ***************** Helpers
+  createResult = (id) => {
+    let result = new Result(this.textHandler, this.imageHandler);
+    result.id = id;
+    result.text = this.loadingText;
+    result.image = this.loadingImage;
+    return result;
+  }
+
   missingElement = (query) => document.querySelector(query) === null
 
   reachedEnd(forceStop = false) {
