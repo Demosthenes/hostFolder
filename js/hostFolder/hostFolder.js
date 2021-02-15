@@ -9,6 +9,8 @@
 */
 
 import result from './result.js';
+import * as loader from './loader.js';
+import * as defaultRenderers from './defaultRenderers.js';
 
 export default class hostFolder {
      /**
@@ -21,6 +23,13 @@ export default class hostFolder {
    * @param {string} loadingText  What should the text say while loading new results?
    * @param {Object} container  A reference to a jquery selector for the container you want the content in
    */
+  
+   // Load default renderers
+  cardRenderer   = defaultRenderers.cardRenderer;
+  textRenderer   = defaultRenderers.textRenderer;
+  imageRenderer  = defaultRenderers.imageRenderer;
+  textCompleted  = defaultRenderers.textCompleted;
+  imageCompleted = defaultRenderers.imageCompleted;
 
   constructor({
     baseUrl = "/test/mapp",
@@ -45,153 +54,83 @@ export default class hostFolder {
     this.loadingImage = false;
     this.results = [];
     this.hasCompleted = 0;
-  }
+  };
 
   // Search and return any content
   load(startId = 1, endId = false) {
     if(!this.loadingImage){ return this.getLoadingImage(()=>{this.load(startId,endId)}) } // Make sure the loading image has loaded
     let id = startId; id--;
     this.foundAll = false;
-    while (!this.foundAll && ++id) {
-      // Loop until we no longer find a valid 200 response
-      let index = id - startId; // Make sure the array starts at 0 and offsets from start
+    while (!this.foundAll && ++id) { // Loop until we no longer find a valid 200 response
+      let index = id - startId;      // Make sure the array starts at 0 and offsets from start
       this.results[index] = new result(id, this.textHandler, this.imageHandler);
       this.results[index].text = this.loadingText;
       this.results[index].image = this.loadingImage;
-
-      // Attempt to get the text for this
-      this.requestText(`${this.baseUrl}/${id}/${this.filename.text}`, index); 
+      this.getText(`${this.baseUrl}/${id}/${this.filename.text}`, index);  // Attempt to get the text for this
       if (!this.foundAll && endId !== false && endId === (id - 1)) 
       { this.reachedEnd(true);  } 
       else if(!this.foundAll) 
       { this.getImage(`${this.baseUrl}/${id}/${this.filename.image}`, index); }
       else 
-      { this.reachedEnd(false); }
-    }
+      { this.reachedEnd(false); };
+    };
     return this.results;
-  }
+  };
   
   // ***************** Helpers
-  noContainer = () => this.container === null
+  missingElement = (query) => document.querySelector(query) === null
 
   reachedEnd(forceStop = false) {
     this.results.pop();
     this.textCompleted(this.results, this.results.length, this.containerId, this.container);
-    if(forceStop){ this.foundAll = true; }
-  }
+    if(forceStop){ this.foundAll = true; };
+  };
 
-  // ***************** Renderers
+  // ***************** Handle listeners
   textHandler = (id, text) => {
-    if (this.noContainer()) return false;
-    if (document.querySelector(`#${this.containerId} #hostFolder_${id}`) === null) {
+    if (this.missingElement(`#${this.containerId}`)) return false;
+    if (this.missingElement(`#${this.containerId} #hostFolder_${id}`)) {
       this.cardRenderer(id, this.containerId, this.container);
-    }
+    };
     this.textRenderer(id, text, this.containerId, this.container);
   }
 
   imageHandler = (id, url) => {
-    if (this.noContainer()) return false;
-    if (document.querySelector(`#${this.containerId} #hostFolder_${id}`) === null) {
+    if (this.missingElement(`#${this.containerId}`)) return false;
+    if (this.missingElement(`#${this.containerId} #hostFolder_${id}`)) {
       this.cardRenderer(id, this.containerId, this.container);
-    }
+    };
     this.imageRenderer(id, url, this.containerId, this.container);
-  }
+  };
 
-  defaultCardRenderer = (id, containerId, container) => {
-    let card = document.createElement("div");
-    card.id = `hostFolder_${id}`
-    card.className = `col-md-3`
-    card.innerHTML = `<p class="host-folder-text"></p><img style="display:none;" class="host-folder-image img-fluid">`
-    container.appendChild(card)
-  }
-
-  defaultTextRenderer = (id, text, containerId, container) => {
-    document.querySelector(`#${this.containerId} #hostFolder_${id} .host-folder-text`).innerText = text
-  }
-
-  defaultImageRenderer = (id, url, containerId, container) => {
-    let img = document.querySelector(`#${this.containerId} #hostFolder_${id} .host-folder-image`);
-    img.src = url;
-    img.style.display = "";
-  }
-
-  defaultTextCompleted = (results, total, containerId, container) => {
-    let textContainer = document.querySelector(`#${this.containerId} #hostFolder_${results[total-1].id + 1}`);
-    textContainer.parentNode.removeChild(textContainer);
-  }
-
-  defaultImageCompleted = (results, total, containerId, container) => {
-  }
-
-  cardRenderer   = this.defaultCardRenderer;
-  textRenderer   = this.defaultTextRenderer;
-  imageRenderer  = this.defaultImageRenderer;
-  textCompleted  = this.defaultTextCompleted;
-  imageCompleted = this.defaultImageCompleted;
-
-  // ***************** Loaders
-
+  // ***************** Data Loaders
   getLoadingImage = (callback = (base64) => {}) => {
     if(this.loadingImage){ return this.loadingImage; }
-    this.requestImage( this.filepath.loadingImage, (base64) => {
-      this.loadingImage = base64
-      callback(base64);
-    })
-  }
+    loader.requestImage( this.filepath.loadingImage, (base64) => { this.loadingImage = base64; callback(base64);});
+  };
 
   getBackupImage = (callback = (base64) => {}) => {
     if(this.backupImage){ return this.backupImage; }
-    this.requestImage( this.filepath.backupImage, (base64) => {
-      this.backupImage = base64
-      callback(base64);
-    })
+    loader.requestImage( this.filepath.backupImage, (base64) => { this.backupImage = base64; callback(base64);});
     return this.getLoadingImage();
-  }
+  };
 
   getImage(url, index) {
-    this.requestImage( url, 
-      (base64) => { this.results[index].image = base64 },
-      () => { this.results[index].image = this.getBackupImage((base64)=> {this.results[index].image = base64}) },
-      () => {
-        this.hasCompleted++;
-      if(this.results.length === this.hasCompleted){
-        this.imageCompleted(this.results, this.hasCompleted, this.containerId, this.container);
-      }
-    })
-  }
+    loader.requestImage( url, 
+      (base64) => { this.results[index].image = base64; },
+      ()       => { this.results[index].image = this.getBackupImage((base64)=> {this.results[index].image = base64}); },
+      ()       => { this.hasCompleted++;
+                    if(this.results.length === this.hasCompleted) {
+                      this.imageCompleted(this.results, this.hasCompleted, this.containerId, this.container);
+                    };
+                  }
+      );
+  };
 
-  requestText(url, index) {
-    let request = new XMLHttpRequest();
-    request.open("GET", url, false) // Request the text file, sync to keep with the while loop
-    request.onreadystatechange = () => {
-      if(request.readyState === 4 && request.status === 200) {
-        this.results[index].text = request.responseText // It exists, add it to result with backup image
-      } else if (request.readyState === 4 && request.status !== 200){
-        this.foundAll = true // The server did not give a 200, no more content discovered
-      }
-    };
-    request.send();
-  }
-  
-  requestImage = (url, success = (data) => {}, error = () => {}, always = () => {}) => {
-    let request = new XMLHttpRequest();
-    request.responseType = 'arraybuffer';
-    request.open("GET", url) // Request the text file, sync to keep with the while loop
-    request.onreadystatechange = () => {
-      if (request.readyState === 4 ) { 
-        if(request.status === 200)       { success(this.binaryToBase64(request.response, this.getType(url))) } 
-        else if (request.status !== 200) { error(); }
-        always(); 
-      }
-    };
-    request.send();
-  }
-
-  getType = (url) => url.substring(url.lastIndexOf(".")+1) 
-
-  binaryToBase64 = (bin, type = 'jpg') => {
-    let uInt8Array = new Uint8Array(bin), i = uInt8Array.length, biStr = new Array(i);
-    while (i--) { biStr[i] = String.fromCharCode(uInt8Array[i]); }
-    return `data:image/${type};base64,${btoa(biStr.join(''))}`;
-  } 
+  getText(url, index) {
+    loader.requestText( url, 
+      (text) => { this.results[index].text = text; },
+      ()     => { this.foundAll = true;            }
+    );
+  };
 }
