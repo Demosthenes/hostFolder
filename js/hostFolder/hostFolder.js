@@ -81,10 +81,9 @@ export default class hostFolder {
   }
 
   // ***************** Renderers
-  
   textHandler = (id, text) => {
     if (this.noContainer()) return false;
-    if (document.getElementById(`hostFolder_${id}`) === null) {
+    if (document.querySelector(`#${this.containerId} #hostFolder_${id}`) === null) {
       this.cardRenderer(id, this.containerId, this.container);
     }
     this.textRenderer(id, text, this.containerId, this.container);
@@ -92,7 +91,7 @@ export default class hostFolder {
 
   imageHandler = (id, url) => {
     if (this.noContainer()) return false;
-    if (document.getElementById(`hostFolder_${id}`) === null) {
+    if (document.querySelector(`#${this.containerId} #hostFolder_${id}`) === null) {
       this.cardRenderer(id, this.containerId, this.container);
     }
     this.imageRenderer(id, url, this.containerId, this.container);
@@ -107,17 +106,17 @@ export default class hostFolder {
   }
 
   defaultTextRenderer = (id, text, containerId, container) => {
-    document.querySelector(`#hostFolder_${id} .host-folder-text`).innerText = text
+    document.querySelector(`#${this.containerId} #hostFolder_${id} .host-folder-text`).innerText = text
   }
 
   defaultImageRenderer = (id, url, containerId, container) => {
-    let img = document.querySelector(`#hostFolder_${id} .host-folder-image`);
+    let img = document.querySelector(`#${this.containerId} #hostFolder_${id} .host-folder-image`);
     img.src = url;
     img.style.display = "";
   }
 
   defaultTextCompleted = (results, total, containerId, container) => {
-    let textContainer = document.getElementById(`hostFolder_${results[total-1].id + 1}`);
+    let textContainer = document.querySelector(`#${this.containerId} #hostFolder_${results[total-1].id + 1}`);
     textContainer.parentNode.removeChild(textContainer);
   }
 
@@ -180,7 +179,7 @@ export default class hostFolder {
     request.open("GET", url) // Request the text file, sync to keep with the while loop
     request.onreadystatechange = () => {
       if (request.readyState === 4 ) { 
-        if(request.status === 200)       { success(this.binaryToBase64(request.response)) } 
+        if(request.status === 200)       { success(this.binaryToBase64(request.response, this.getType(url))) } 
         else if (request.status !== 200) { error(); }
         always(); 
       }
@@ -188,9 +187,11 @@ export default class hostFolder {
     request.send();
   }
 
-  binaryToBase64 = (bin) => {
+  getType = (url) => url.substring(url.lastIndexOf(".")+1) 
+
+  binaryToBase64 = (bin, type = 'jpg') => {
     let uInt8Array = new Uint8Array(bin), i = uInt8Array.length, biStr = new Array(i);
     while (i--) { biStr[i] = String.fromCharCode(uInt8Array[i]); }
-    return `data:image/jpg;base64,${btoa(biStr.join(''))}`;
+    return `data:image/${type};base64,${btoa(biStr.join(''))}`;
   } 
 }
