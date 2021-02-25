@@ -61,7 +61,9 @@ export default class HostFolder {
     if(!this.loadingImage){ return this.getLoadingImage(()=>{this.load(startId,endId)}) } // Make sure the loading image has loaded
     let id = startId, index, result; this.foundAll = false;
     while (!this.foundAll) { // Loop until we no longer find a valid 200 response
-      this.getText(this.textUrl(id), this.results[index = id - startId] = result = this.createResult(id));  // Attempt to get the text for this
+      if(endId !== false && endId !== (id - 1)){
+        this.getText(this.textUrl(id), this.results[index = id - startId] = result = this.createResult(id));  // Attempt to get the text for this
+      }
       if     (!this.foundAll && endId !== false && endId === (id - 1))  { this.endHandler(true);                    } 
       else if(!this.foundAll)                                           { this.getImage(this.imageUrl(id), result); }
       else                                                              { this.endHandler(false);                   };
