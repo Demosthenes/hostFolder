@@ -38,8 +38,8 @@ export default class HostFolder {
       image: "image.jpg",
     },
     filepath = {
-      loadingImage: "loadingImage.jpg",
-      backupImage: "noImage.jpg",
+      loadingImage: "loadingImage.gif",
+      backupImage: "noImage.gif",
     },
     loadingText = "Checking for more posts...",
     container = null
@@ -59,46 +59,38 @@ export default class HostFolder {
   // Search and return any content
   load(startId = 1, endId = false) {
     if(!this.loadingImage){ return this.getLoadingImage(()=>{this.load(startId,endId)}) } // Make sure the loading image has loaded
-    let id = startId, result; id--;
-    this.foundAll = false;
-    while (!this.foundAll && ++id) { // Loop until we no longer find a valid 200 response
-      let index = id - startId;      // Make sure the array starts at 0 and offsets from start
-      this.results[index] = result = this.createResult(id);
-      this.getText(this.textUrl(id), result);  // Attempt to get the text for this
-      if (!this.foundAll && endId !== false && endId === (id - 1)) 
-      { this.endHandler(true);  } 
-      else if(!this.foundAll) 
-      { this.getImage(this.imageUrl(id), result); }
-      else 
-      { this.endHandler(false); };
-    };
-    return this.results;
+    let id = startId, index, result; this.foundAll = false;
+    while (!this.foundAll) { // Loop until we no longer find a valid 200 response
+      this.getText(this.textUrl(id), this.results[index = id - startId] = result = this.createResult(id));  // Attempt to get the text for this
+      if     (!this.foundAll && endId !== false && endId === (id - 1))  { this.endHandler(true);                    } 
+      else if(!this.foundAll)                                           { this.getImage(this.imageUrl(id), result); }
+      else                                                              { this.endHandler(false);                   };
+      id++;
+    }; return this.results;
   };
 
   // ***************** Helpers
   textUrl  = id => `${this.baseUrl}/${id}/${this.filename.text}`;
   imageUrl = id => `${this.baseUrl}/${id}/${this.filename.image}`;
 
-  createResult = (id) => {
+  createResult = id => {
     let result = new Result(this.textHandler, this.imageHandler);
-    result.id = id;
-    result.text = this.loadingText;
-    result.image = this.loadingImage;
+    result.id = id, result.text = this.loadingText, result.image = this.loadingImage;
     return result;
   }
 
-  missingElement = (query) => document.querySelector(query) === null
+  missingElement = query => document.querySelector(query) === null;
 
   // ***************** Handle listeners
   textHandler = (id, text) => {
     if (this.missingElement(`#${this.containerId}`)) return false;
-    if (this.missingElement(`#${this.containerId} #hostFolder_${id}`)) { this.cardRenderer(id, this.containerId, this.container); };
+    if (this.missingElement(`#${this.containerId} #hostFolder_${id}`)) {this.cardRenderer(id, this.containerId, this.container);};
     this.textRenderer(id, text, this.containerId, this.container);
   }
 
   imageHandler = (id, url) => {
     if (this.missingElement(`#${this.containerId}`)) return false;
-    if (this.missingElement(`#${this.containerId} #hostFolder_${id}`)) { this.cardRenderer(id, this.containerId, this.container); };
+    if (this.missingElement(`#${this.containerId} #hostFolder_${id}`)) {this.cardRenderer(id, this.containerId, this.container);};
     this.imageRenderer(id, url, this.containerId, this.container);
   };
   
@@ -127,14 +119,14 @@ export default class HostFolder {
       );
   };
 
-  getLoadingImage = (callback = (base64) => {}) => {
+  getLoadingImage = (callback = base64 => {}) => {
     if(this.loadingImage){ return this.loadingImage; }
-    loader.requestImage( this.filepath.loadingImage, (base64) => { this.loadingImage = base64; callback(base64);});
+    loader.requestImage(this.filepath.loadingImage, base64 => { this.loadingImage = base64; callback(base64);});
   };
 
-  getBackupImage = (callback = (base64) => {}) => {
+  getBackupImage = (callback = base64 => {}) => {
     if(this.backupImage){ return this.backupImage; }
-    loader.requestImage( this.filepath.backupImage, (base64) => { this.backupImage = base64; callback(base64);});
+    loader.requestImage(this.filepath.backupImage, base64 => { this.backupImage = base64; callback(base64);});
     return this.getLoadingImage();
   };
 }

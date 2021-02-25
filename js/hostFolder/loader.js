@@ -1,11 +1,11 @@
 
-export function requestText(url, success = (data) => { }, error = () => { }, always = () => { }) {
+export function requestText(url, success = (data) => { }, error = (status) => { }, always = () => { }) {
     let request = new XMLHttpRequest();
     request.open("GET", url, false) // Request the text file, sync to keep with the while loop
     request.onreadystatechange = () => {
         if (request.readyState === 4) {
-            if (request.status === 200) { success(request.responseText) }
-            else if (request.status !== 200) { error(); }
+            if      (request.status === 200) { success(request.responseText) }
+            else if (request.status !== 200) { error(request.status);                      }
             always();
         }
     };
@@ -13,14 +13,14 @@ export function requestText(url, success = (data) => { }, error = () => { }, alw
     return request;
 }
 
-export function requestImage(url, success = (data) => { }, error = () => { }, always = () => { }) {
+export function requestImage(url, success = (data) => { }, error = (status) => { }, always = () => { }) {
     let request = new XMLHttpRequest();
     request.responseType = 'arraybuffer';
     request.open("GET", url) // Request the text file, sync to keep with the while loop
     request.onreadystatechange = () => {
         if (request.readyState === 4) {
-            if (request.status === 200) { success(binaryToBase64(request.response, getType(url))) }
-            else if (request.status !== 200) { error(); }
+            if      (request.status === 200) { success(binaryToBase64(request.response, getType(url))) }
+            else if (request.status !== 200) { error(request.status);                                                }
             always();
         }
     };

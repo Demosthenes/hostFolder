@@ -15,8 +15,8 @@ export default function myHostFolder(containerId, range) {
             image: "image.jpg",
         },
         filepath: {
-            loadingImage: "/hostFolder/img/loadingImage.jpg",
-            backupImage: "/hostFolder/img/noImage.jpg",
+            loadingImage: "/hostFolder/img/loadingImage.gif",
+            backupImage: "/hostFolder/img/noImage.gif",
         },
         loadingText: "Checking for more posts...",
         container: containerId

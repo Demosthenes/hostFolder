@@ -6,9 +6,9 @@
 
 import myHostFolder from './myHostFolder.js'
 
-let folder1 = myHostFolder('gallery1', [1,4]);
-let folder2 = myHostFolder('gallery2', [9]);
+let folder1 = myHostFolder('gallery1', [1,12]);
+//let folder2 = myHostFolder('gallery2', [9]);
 
 setTimeout(function(){
-    folder1.load(5,8)
+    ////folder1.load(5,8)
 }, 5000)
